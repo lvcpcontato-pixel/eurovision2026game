@@ -60,7 +60,7 @@ export default async function Dashboard() {
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm font-medium mb-2" style={{ color: '#a78bfa' }}>
               <Sparkles size={14} />
-              <span>Basel • Suíça • Maio 2026</span>
+              <span>Viena • Áustria • Maio 2026</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-white mb-1">
               Olá, {userName.split(' ')[0]}! 👋
@@ -151,7 +151,7 @@ export default async function Dashboard() {
           <div className="rounded-2xl p-4 text-center" style={{ background: 'linear-gradient(to right, rgba(49, 46, 129, 0.3), rgba(88, 28, 135, 0.3))', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
             <div className="text-2xl mb-2">🎶</div>
             <p className="text-sm" style={{ color: '#9ca3af' }}>
-              <span className="text-white font-medium">Eurovision 2026</span> acontece em Basel, Suíça.<br />
+              <span className="text-white font-medium">Eurovision 2026</span> acontece em Viena, Áustria.<br />
               Quanto mais você acerta, mais pontos você ganha!
             </p>
           </div>

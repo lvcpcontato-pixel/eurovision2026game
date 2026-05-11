@@ -49,7 +49,7 @@ export default function LandingClient() {
           <div className="text-8xl mb-4 float-animation">🎤</div>
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm font-medium mb-6" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#c4b5fd' }}>
             <Sparkles size={14} />
-            <span>Basel, Suíça • Maio 2026</span>
+            <span>Viena, Áustria • Maio 2026</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-black mb-4 tracking-tight">
             <span className="block text-white">Eurovision</span>
