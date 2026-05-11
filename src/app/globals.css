@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-esc-purple: #8B5CF6;
+  --color-esc-pink: #EC4899;
+  --color-esc-gold: #F59E0B;
+  --color-esc-teal: #06B6D4;
+  --color-esc-dark: #0a0a1a;
+  --color-esc-card: #12122a;
+  --color-esc-border: #2a2a4a;
+}
+
+@layer base {
+  body {
+    background-color: #0a0a1a;
+    color: #f8f8ff;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), 0 0 60px rgba(236, 72, 153, 0.4); }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.glow-card {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.eurovision-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f64f59 50%, #c471ed 75%, #12c2e9 100%);
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
