@@ -10,22 +10,17 @@ export default async function ComparePage() {
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 
-  // Get all other users
-  const { data: otherUsers } = await supabase
-    .from('profiles')
-    .select('*')
-    .neq('id', user.id)
-
-  // Get my predictions
-  const { data: mySF } = await supabase
-    .from('semifinal_predictions')
-    .select('*')
-    .eq('user_id', user.id)
-
-  const { data: myFinal } = await supabase
-    .from('final_predictions')
-    .select('*')
-    .eq('user_id', user.id)
+  const [
+    { data: otherUsers },
+    { data: mySF },
+    { data: myFinal },
+    { data: countries },
+  ] = await Promise.all([
+    supabase.from('profiles').select('*').neq('id', user.id),
+    supabase.from('semifinal_predictions').select('*').eq('user_id', user.id),
+    supabase.from('final_predictions').select('*').eq('user_id', user.id),
+    supabase.from('countries').select('*').order('display_order'),
+  ])
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0a1a' }}>
@@ -37,6 +32,7 @@ export default async function ComparePage() {
           mySFPredictions={mySF || []}
           myFinalPredictions={myFinal || []}
           userId={user.id}
+          countries={countries || []}
         />
       </div>
     </div>
