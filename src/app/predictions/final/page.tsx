@@ -21,12 +21,14 @@ export default async function FinalPage() {
     .order('position')
 
   const allCountries = countries || []
-  const sfPickIds = new Set((sfPredictions || []).map(p => p.country_id))
+  const sf = sfPredictions || []
+  const sfPickIds = new Set(sf.map(p => p.country_id))
+  const sf1Count = sf.filter(p => p.semifinal === 1).length
+  const sf2Count = sf.filter(p => p.semifinal === 2).length
+
   const eligibleCountries = allCountries
     .filter(c => c.is_direct_finalist || sfPickIds.has(c.id))
     .map(c => ({ id: c.id, name: c.name, flag_emoji: c.flag_emoji }))
-
-  const hasSemiPredictions = (sfPredictions || []).length > 0
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0a1a' }}>
@@ -36,7 +38,8 @@ export default async function FinalPage() {
           eligibleCountries={eligibleCountries}
           initialPredictions={finalPredictions || []}
           userId={user.id}
-          hasSemiPredictions={hasSemiPredictions}
+          sf1Count={sf1Count}
+          sf2Count={sf2Count}
         />
       </div>
     </div>

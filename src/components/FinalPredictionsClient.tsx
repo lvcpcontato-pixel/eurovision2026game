@@ -11,7 +11,8 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { createClient } from '@/lib/supabase/client'
-import { GripVertical, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
+import { GripVertical, AlertCircle, ArrowRight } from 'lucide-react'
 
 interface RankedCountry {
   id: number
@@ -50,10 +51,14 @@ interface Props {
   eligibleCountries: RankedCountry[]
   initialPredictions: { country_id: number; position: number }[]
   userId: string
-  hasSemiPredictions: boolean
+  sf1Count: number
+  sf2Count: number
 }
 
-export default function FinalPredictionsClient({ eligibleCountries, initialPredictions, userId, hasSemiPredictions }: Props) {
+export default function FinalPredictionsClient({ eligibleCountries, initialPredictions, userId, sf1Count, sf2Count }: Props) {
+  const sf1Complete = sf1Count >= 10
+  const sf2Complete = sf2Count >= 10
+  const semisComplete = sf1Complete && sf2Complete
   const supabase = createClient()
 
   const [ranked, setRanked] = useState<RankedCountry[]>(() => {
@@ -102,21 +107,6 @@ export default function FinalPredictionsClient({ eligibleCountries, initialPredi
     }
   }
 
-  if (!hasSemiPredictions) {
-    return (
-      <main className="px-4 md:px-8 py-6 pb-24 md:pb-8 max-w-2xl mx-auto">
-        <h1 className="text-3xl font-black text-white mb-4">🏆 Grande Final</h1>
-        <div className="rounded-2xl p-8 text-center" style={{ backgroundColor: '#12122a', border: '1px solid #2a2a4a' }}>
-          <AlertCircle size={40} className="mx-auto mb-3" style={{ color: '#f59e0b' }} />
-          <p className="font-bold text-white mb-2">Faça seus palpites das semifinais primeiro!</p>
-          <p className="text-sm" style={{ color: '#9ca3af' }}>
-            A lista da final é montada automaticamente com os países que você selecionou nas semifinais + Big 5 e Áustria.
-          </p>
-        </div>
-      </main>
-    )
-  }
-
   return (
     <main className="px-4 md:px-8 py-6 pb-24 md:pb-8" style={{ maxWidth: '700px', margin: '0 auto' }}>
       <div className="mb-6 flex items-start justify-between gap-4">
@@ -132,6 +122,30 @@ export default function FinalPredictionsClient({ eligibleCountries, initialPredi
           <span className="text-sm font-bold" style={{ color: '#9ca3af' }}>{ranked.length} países</span>
         </div>
       </div>
+
+      {/* Warning if semifinals incomplete */}
+      {!semisComplete && (
+        <div className="rounded-2xl p-4 mb-6 flex items-start gap-3" style={{ backgroundColor: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
+          <AlertCircle size={20} className="flex-shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+          <div className="flex-1">
+            <p className="font-semibold text-white text-sm mb-1">Semifinais incompletas</p>
+            <p className="text-xs mb-2" style={{ color: '#d1d5db' }}>
+              Complete as semifinais para ver o ranking com todos os seus classificados.
+            </p>
+            <div className="flex gap-3 text-xs mb-3">
+              <span style={{ color: sf1Complete ? '#86efac' : '#fbbf24' }}>
+                {sf1Complete ? '✓' : '⚠'} SF1: {sf1Count}/10
+              </span>
+              <span style={{ color: sf2Complete ? '#86efac' : '#fbbf24' }}>
+                {sf2Complete ? '✓' : '⚠'} SF2: {sf2Count}/10
+              </span>
+            </div>
+            <Link href="/predictions/semifinals" className="inline-flex items-center gap-1 text-xs font-bold rounded-lg px-3 py-1.5" style={{ backgroundColor: 'rgba(245,158,11,0.2)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.4)' }}>
+              Completar semifinais <ArrowRight size={12} />
+            </Link>
+          </div>
+        </div>
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={ranked.map(c => c.id)} strategy={verticalListSortingStrategy}>
