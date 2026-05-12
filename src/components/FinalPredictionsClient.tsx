@@ -63,10 +63,12 @@ export default function FinalPredictionsClient({ eligibleCountries, initialPredi
 
   const [ranked, setRanked] = useState<RankedCountry[]>(() => {
     if (initialPredictions.length > 0) {
-      return initialPredictions
-        .sort((a, b) => a.position - b.position)
-        .map(p => eligibleCountries.find(c => c.id === p.country_id))
-        .filter(Boolean) as RankedCountry[]
+      const savedOrder = new Map(initialPredictions.map(p => [p.country_id, p.position]))
+      return [...eligibleCountries].sort((a, b) => {
+        const posA = savedOrder.get(a.id) ?? 99999
+        const posB = savedOrder.get(b.id) ?? 99999
+        return posA - posB
+      })
     }
     return eligibleCountries
   })
