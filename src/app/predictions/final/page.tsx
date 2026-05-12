@@ -28,7 +28,7 @@ export default async function FinalPage() {
 
   const eligibleCountries = allCountries
     .filter(c => c.is_direct_finalist || sfPickIds.has(c.id))
-    .map(c => ({ id: c.id, name: c.name, flag_emoji: c.flag_emoji }))
+    .map(c => ({ id: c.id, name: c.name, flag_emoji: c.flag_emoji, youtube_video_id: c.youtube_video_id }))
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0a1a' }}>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Check, Info } from 'lucide-react'
+import { Check, Info, Play, X } from 'lucide-react'
 
 interface Country {
   id: number
@@ -11,6 +11,7 @@ interface Country {
   flag_emoji: string
   semifinal: number | null
   is_direct_finalist: boolean
+  youtube_video_id?: string
 }
 
 interface Prediction {
@@ -32,6 +33,7 @@ export default function SemifinalsClient({ countries, initialPredictions, userId
   )
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [videoId, setVideoId] = useState<string | null>(null)
 
   const semi1Countries = countries.filter(c => c.semifinal === 1)
   const semi2Countries = countries.filter(c => c.semifinal === 2)
@@ -130,27 +132,38 @@ export default function SemifinalsClient({ countries, initialPredictions, userId
           const isDisabled = !isSelected && count >= 10
 
           return (
-            <button
-              key={country.id}
-              onClick={() => toggleCountry(country.id)}
-              disabled={isDisabled}
-              className="relative flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-150"
-              style={
-                isSelected
-                  ? { backgroundColor: 'rgba(139, 92, 246, 0.2)', border: '2px solid #8B5CF6', color: 'white', transform: 'scale(1.05)' }
-                  : isDisabled
-                  ? { backgroundColor: cardBg, border: `2px solid ${borderColor}`, color: '#4b5563', opacity: 0.4, cursor: 'not-allowed' }
-                  : { backgroundColor: cardBg, border: `2px solid ${borderColor}`, color: '#d1d5db' }
-              }
-            >
-              {isSelected && (
-                <div className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#7c3aed' }}>
-                  <Check size={12} className="text-white" />
-                </div>
+            <div key={country.id} className="relative">
+              <button
+                onClick={() => toggleCountry(country.id)}
+                disabled={isDisabled}
+                className="relative w-full flex flex-col items-center gap-2 p-4 rounded-2xl font-medium transition-all duration-150"
+                style={
+                  isSelected
+                    ? { backgroundColor: 'rgba(139, 92, 246, 0.2)', border: '2px solid #8B5CF6', color: 'white', transform: 'scale(1.05)' }
+                    : isDisabled
+                    ? { backgroundColor: cardBg, border: `2px solid ${borderColor}`, color: '#4b5563', opacity: 0.4, cursor: 'not-allowed' }
+                    : { backgroundColor: cardBg, border: `2px solid ${borderColor}`, color: '#d1d5db' }
+                }
+              >
+                {isSelected && (
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#7c3aed' }}>
+                    <Check size={12} className="text-white" />
+                  </div>
+                )}
+                <span className="text-3xl">{country.flag_emoji}</span>
+                <span className="text-sm text-center leading-tight">{country.name}</span>
+              </button>
+              {country.youtube_video_id && (
+                <button
+                  onClick={() => setVideoId(country.youtube_video_id!)}
+                  className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-all"
+                  style={{ backgroundColor: 'rgba(220,38,38,0.85)', color: 'white' }}
+                  title="Ouvir música"
+                >
+                  <Play size={10} fill="white" />
+                </button>
               )}
-              <span className="text-3xl">{country.flag_emoji}</span>
-              <span className="text-sm text-center leading-tight">{country.name}</span>
-            </button>
+            </div>
           )
         })}
       </div>
@@ -163,10 +176,42 @@ export default function SemifinalsClient({ countries, initialPredictions, userId
           </div>
           <div className="flex flex-wrap gap-2">
             {currentSelected.map(c => (
-              <span key={c.id} className="rounded-full px-3 py-1 text-sm" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#c4b5fd' }}>
+              <button
+                key={c.id}
+                onClick={() => c.youtube_video_id && setVideoId(c.youtube_video_id)}
+                className="flex items-center gap-1 rounded-full px-3 py-1 text-sm transition-all"
+                style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#c4b5fd' }}
+              >
                 {c.flag_emoji} {c.name}
-              </span>
+                {c.youtube_video_id && <Play size={10} fill="currentColor" />}
+              </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* YouTube player modal */}
+      {videoId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+          onClick={() => setVideoId(null)}
+        >
+          <div className="relative w-full max-w-2xl" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setVideoId(null)}
+              className="absolute -top-10 right-0 flex items-center gap-1 text-white text-sm font-medium"
+            >
+              <X size={16} /> Fechar
+            </button>
+            <div className="relative rounded-2xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                className="absolute inset-0 w-full h-full"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       )}

@@ -12,12 +12,13 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { GripVertical, AlertCircle, ArrowRight } from 'lucide-react'
+import { GripVertical, AlertCircle, ArrowRight, Play, X } from 'lucide-react'
 
 interface RankedCountry {
   id: number
   name: string
   flag_emoji: string
+  youtube_video_id?: string
 }
 
 function getMedalStyle(pos: number) {
@@ -27,7 +28,7 @@ function getMedalStyle(pos: number) {
   return { backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#6b7280' }
 }
 
-function SortableItem({ country, position }: { country: RankedCountry; position: number }) {
+function SortableItem({ country, position, onPlay }: { country: RankedCountry; position: number; onPlay?: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: country.id })
   return (
     <div
@@ -43,6 +44,16 @@ function SortableItem({ country, position }: { country: RankedCountry; position:
       </div>
       <span className="text-2xl flex-shrink-0">{country.flag_emoji}</span>
       <span className="flex-1 font-medium text-white text-sm">{country.name}</span>
+      {country.youtube_video_id && onPlay && (
+        <button
+          onClick={onPlay}
+          className="flex items-center justify-center w-7 h-7 rounded-full flex-shrink-0 transition-all"
+          style={{ backgroundColor: 'rgba(220,38,38,0.85)', color: 'white' }}
+          title="Ouvir música"
+        >
+          <Play size={12} fill="white" />
+        </button>
+      )}
     </div>
   )
 }
@@ -61,6 +72,7 @@ export default function FinalPredictionsClient({ eligibleCountries, initialPredi
   const semisComplete = sf1Complete && sf2Complete
   const supabase = createClient()
 
+  const [videoId, setVideoId] = useState<string | null>(null)
   const [ranked, setRanked] = useState<RankedCountry[]>(() => {
     if (initialPredictions.length > 0) {
       const savedOrder = new Map(initialPredictions.map(p => [p.country_id, p.position]))
@@ -153,11 +165,24 @@ export default function FinalPredictionsClient({ eligibleCountries, initialPredi
         <SortableContext items={ranked.map(c => c.id)} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-2">
             {ranked.map((country, index) => (
-              <SortableItem key={country.id} country={country} position={index + 1} />
+              <SortableItem key={country.id} country={country} position={index + 1} onPlay={country.youtube_video_id ? () => setVideoId(country.youtube_video_id!) : undefined} />
             ))}
           </div>
         </SortableContext>
       </DndContext>
+
+      {videoId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }} onClick={() => setVideoId(null)}>
+          <div className="relative w-full max-w-2xl" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setVideoId(null)} className="absolute -top-10 right-0 flex items-center gap-1 text-white text-sm font-medium">
+              <X size={16} /> Fechar
+            </button>
+            <div className="relative rounded-2xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+              <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} className="absolute inset-0 w-full h-full" allow="autoplay; encrypted-media" allowFullScreen />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
