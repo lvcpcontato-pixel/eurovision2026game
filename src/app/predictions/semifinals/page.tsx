@@ -14,6 +14,13 @@ export default async function SemifinalsPage() {
     .from('semifinal_predictions')
     .select('*')
     .eq('user_id', user.id)
+  const { data: actualResults } = await supabase
+    .from('actual_results')
+    .select('result_type')
+
+  const resultTypes = new Set((actualResults || []).map(r => r.result_type))
+  const sf1Locked = resultTypes.has('semifinal1')
+  const sf2Locked = resultTypes.has('semifinal2')
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0a1a' }}>
@@ -23,6 +30,8 @@ export default async function SemifinalsPage() {
           countries={countries || []}
           initialPredictions={predictions || []}
           userId={user.id}
+          sf1Locked={sf1Locked}
+          sf2Locked={sf2Locked}
         />
       </div>
     </div>
